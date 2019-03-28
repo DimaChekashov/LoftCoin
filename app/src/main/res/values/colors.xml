@@ -36,6 +36,7 @@
     <color name="gray_60">#2E2F47</color>
     <color name="gray_80">#191A2A</color>
     <color name="gray_100">#10101A</color>
+    <color name="gray_110">#10101A</color>
 
 
     <color name="start_gradient_btn">#ff4465</color>
