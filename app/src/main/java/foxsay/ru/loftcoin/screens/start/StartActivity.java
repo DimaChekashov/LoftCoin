@@ -75,11 +75,18 @@ public class StartActivity extends AppCompatActivity implements StartView {
 
     private void startAnimation() {
 
-        ObjectAnimator innerAnimation = ObjectAnimator.ofFloat(topCorner, "rotation", 0, 360);
-        innerAnimation.setDuration(30000);
-        innerAnimation.setRepeatMode(ValueAnimator.RESTART);
+        ObjectAnimator innerAnimation = ObjectAnimator.ofFloat(topCorner, "translationY", 0f, -100f);
+        innerAnimation.setDuration(4000);
+        innerAnimation.setRepeatMode(ValueAnimator.REVERSE);
         innerAnimation.setRepeatCount(ValueAnimator.INFINITE);
         innerAnimation.setInterpolator(new LinearInterpolator());
+
+
+        ObjectAnimator innerAnimationRotate = ObjectAnimator.ofFloat(topCorner, "rotation", 0, 360);
+        innerAnimationRotate.setDuration(20000);
+        innerAnimationRotate.setRepeatMode(ValueAnimator.RESTART);
+        innerAnimationRotate.setRepeatCount(ValueAnimator.INFINITE);
+        innerAnimationRotate.setInterpolator(new LinearInterpolator());
 
         ObjectAnimator outerAnimation = ObjectAnimator.ofFloat(bottomCorner, "rotation", 0, 360);
         outerAnimation.setDuration(30000);
@@ -88,7 +95,7 @@ public class StartActivity extends AppCompatActivity implements StartView {
         outerAnimation.setInterpolator(new LinearInterpolator());
 
         AnimatorSet set = new AnimatorSet();
-        set.play(innerAnimation).with(outerAnimation);
+        set.playTogether(innerAnimation, innerAnimationRotate, outerAnimation);
         set.start();
 
     }

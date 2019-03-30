@@ -12,6 +12,7 @@
         android:layout_height="166dp"
         android:src="@drawable/start_bg_top_corner"
         android:translationX="-101dp"
+        android:translationY="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
