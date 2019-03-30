@@ -1,4 +1,4 @@
-package foxsay.ru.loftcoin.prefs;
+package foxsay.ru.loftcoin.data.prefs;
 
 public interface Prefs {
 
