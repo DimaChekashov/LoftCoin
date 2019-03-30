@@ -6,7 +6,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import foxsay.ru.loftcoin.App;
 import foxsay.ru.loftcoin.R;
-import foxsay.ru.loftcoin.prefs.Prefs;
+import foxsay.ru.loftcoin.data.prefs.Prefs;
 import foxsay.ru.loftcoin.screens.start.StartActivity;
 
 import android.content.Context;
