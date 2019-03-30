@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import foxsay.ru.loftcoin.data.api.Api;
 import foxsay.ru.loftcoin.data.api.model.RateResponse;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
+import foxsay.ru.loftcoin.utils.Fiat;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,6 +35,8 @@ public class StartPresenterImpl implements StartPresenter {
 
     @Override
     public void loadRates() {
+
+        Fiat fiat = prefs.getFiatCurrency();
 
         Call<RateResponse> call = api.rates(Api.CONVERT);
 
