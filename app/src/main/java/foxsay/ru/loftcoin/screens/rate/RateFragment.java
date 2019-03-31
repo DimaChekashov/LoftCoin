@@ -24,6 +24,10 @@ import foxsay.ru.loftcoin.App;
 import foxsay.ru.loftcoin.R;
 import foxsay.ru.loftcoin.data.api.Api;
 import foxsay.ru.loftcoin.data.api.model.Coin;
+import foxsay.ru.loftcoin.data.db.Database;
+import foxsay.ru.loftcoin.data.db.model.CoinEntity;
+import foxsay.ru.loftcoin.data.db.model.CoinEntityMapper;
+import foxsay.ru.loftcoin.data.db.model.CoinEntityMapperImpl;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
 
 /**
@@ -63,8 +67,10 @@ public class RateFragment extends Fragment implements RateView {
 
         Api api = ((App) getActivity().getApplication()).getApi();
         Prefs prefs = ((App) getActivity().getApplication()).getPrefs();
+        Database database = ((App) getActivity().getApplication()).getDatabase();
+        CoinEntityMapper mapper = new CoinEntityMapperImpl();
 
-        presenter = new RatePresenterImpl(prefs, api);
+        presenter = new RatePresenterImpl(prefs, api, database, mapper);
         adapter = new RateAdapter(prefs);
     }
 
@@ -98,7 +104,7 @@ public class RateFragment extends Fragment implements RateView {
     }
 
     @Override
-    public void setCoins(List<Coin> coins) {
+    public void setCoins(List<CoinEntity> coins) {
         adapter.setItems(coins);
     }
 

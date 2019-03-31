@@ -4,6 +4,7 @@ package foxsay.ru.loftcoin.data.db.model;
 import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import foxsay.ru.loftcoin.utils.Fiat;
 
 @Entity(tableName = "Coin")
 public class CoinEntity {
@@ -28,4 +29,17 @@ public class CoinEntity {
     @Embedded(prefix = "rub_")
     public QuoteEntity rub;
 
+
+    public QuoteEntity getQuote(Fiat fiat) {
+        switch (fiat) {
+            case USD:
+                return usd;
+            case EUR:
+                return eur;
+            case RUB:
+                return rub;
+        }
+
+        return usd;
+    }
 }
