@@ -65,7 +65,7 @@ public class RateFragment extends Fragment implements RateView {
         Prefs prefs = ((App) getActivity().getApplication()).getPrefs();
 
         presenter = new RatePresenterImpl(prefs, api);
-        adapter = new RateAdapter();
+        adapter = new RateAdapter(prefs);
     }
 
     @Override

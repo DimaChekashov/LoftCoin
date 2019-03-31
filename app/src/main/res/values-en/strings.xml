@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">LoftCoin</string>
 
+    <string name="currency_amount">%s %s</string>
+
     <string name="welcome_title_1">Buy and sell</string>
     <string name="welcome_title_2">Cryptocurrency rate</string>
     <string name="welcome_title_3">Currency Converter</string>
