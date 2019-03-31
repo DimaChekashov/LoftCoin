@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import foxsay.ru.loftcoin.data.api.model.Coin;
+import foxsay.ru.loftcoin.data.api.model.Quote;
+import foxsay.ru.loftcoin.utils.Fiat;
 
 public class CoinEntityMapperImpl implements CoinEntityMapper {
 
@@ -27,6 +29,25 @@ public class CoinEntityMapperImpl implements CoinEntityMapper {
         entity.symbol = coin.symbol;
         entity.slug = coin.slug;
         entity.lastUpdated = coin.lastUpdated;
+
+        entity.usd = mapQuote(coin.quote.get(Fiat.USD.name()));
+        entity.eur = mapQuote(coin.quote.get(Fiat.EUR.name()));
+        entity.rub = mapQuote(coin.quote.get(Fiat.RUB.name()));
+
+        return entity;
+    }
+
+    private QuoteEntity mapQuote(Quote quote) {
+        if (quote == null) {
+            return null;
+        }
+
+        QuoteEntity entity = new QuoteEntity();
+
+        entity.price = quote.price;
+        entity.percentChange1h = quote.percentChange1h;
+        entity.percentChange24h = quote.percentChange24h;
+        entity.percentChange7d = quote.percentChange7d;
 
         return entity;
     }

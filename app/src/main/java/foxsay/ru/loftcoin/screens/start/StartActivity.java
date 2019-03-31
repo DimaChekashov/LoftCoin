@@ -6,6 +6,9 @@ import butterknife.ButterKnife;
 import foxsay.ru.loftcoin.App;
 import foxsay.ru.loftcoin.R;
 import foxsay.ru.loftcoin.data.api.Api;
+import foxsay.ru.loftcoin.data.db.Database;
+import foxsay.ru.loftcoin.data.db.model.CoinEntityMapper;
+import foxsay.ru.loftcoin.data.db.model.CoinEntityMapperImpl;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
 import foxsay.ru.loftcoin.screens.main.MainActivity;
 
@@ -47,8 +50,10 @@ public class StartActivity extends AppCompatActivity implements StartView {
 
         Prefs prefs = ((App) getApplication()).getPrefs();
         Api api = ((App) getApplication()).getApi();
+        Database database = ((App) getApplication()).getDatabase();
+        CoinEntityMapper mapper = new CoinEntityMapperImpl();
 
-        presenter = new StartPresenterImpl(prefs, api);
+        presenter = new StartPresenterImpl(prefs, api, database, mapper);
 
         presenter.attachView(this);
 
