@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,12 +30,12 @@ import foxsay.ru.loftcoin.data.db.model.CoinEntity;
 import foxsay.ru.loftcoin.data.db.model.CoinEntityMapper;
 import foxsay.ru.loftcoin.data.db.model.CoinEntityMapperImpl;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
+import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class RateFragment extends Fragment implements RateView {
-
 
     public RateFragment() {
         // Required empty public constructor
@@ -105,6 +106,7 @@ public class RateFragment extends Fragment implements RateView {
 
     @Override
     public void setCoins(List<CoinEntity> coins) {
+        Timber.d("setCoins: " + coins);
         adapter.setItems(coins);
     }
 

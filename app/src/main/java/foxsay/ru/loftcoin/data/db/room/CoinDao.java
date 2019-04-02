@@ -7,6 +7,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import foxsay.ru.loftcoin.data.db.model.CoinEntity;
+import io.reactivex.Flowable;
 
 @Dao
 public interface CoinDao {
@@ -16,6 +17,6 @@ public interface CoinDao {
 
 
     @Query("SELECT * FROM Coin")
-    List<CoinEntity> getCoins();
+    Flowable<List<CoinEntity>> getCoins();
 
 }

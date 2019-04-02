@@ -10,10 +10,12 @@ import foxsay.ru.loftcoin.data.db.Database;
 import foxsay.ru.loftcoin.data.db.model.CoinEntity;
 import foxsay.ru.loftcoin.data.db.model.CoinEntityMapper;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
-import foxsay.ru.loftcoin.utils.Fiat;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 public class StartPresenterImpl implements StartPresenter {
@@ -25,6 +27,8 @@ public class StartPresenterImpl implements StartPresenter {
 
     @Nullable
     private StartView view;
+
+    private CompositeDisposable disposables = new CompositeDisposable();
 
     public StartPresenterImpl(Prefs prefs, Api api, Database database, CoinEntityMapper coinEntityMapper) {
         this.prefs = prefs;
@@ -40,35 +44,35 @@ public class StartPresenterImpl implements StartPresenter {
 
     @Override
     public void detachView() {
+        disposables.dispose();
         this.view = null;
     }
 
     @Override
     public void loadRates() {
 
-        Call<RateResponse> call = api.rates(Api.CONVERT);
-
-        call.enqueue(new Callback<RateResponse>() {
-            @Override
-            public void onResponse(Call<RateResponse> call, Response<RateResponse> response) {
-
-                if (response.body() != null) {
-                    List<Coin> coins = response.body().data;
+        Disposable disposable = api.rates(Api.CONVERT)
+                .subscribeOn(Schedulers.io())
+                .map(rateResponse -> {
+                    List<Coin> coins = rateResponse.data;
                     List<CoinEntity> coinEntities = coinEntityMapper.map(coins);
+                    return coinEntities;
+                })
+                .doOnNext(coinEntities -> database.saveCoins(coinEntities))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        coinEntities -> {
+                            if (view != null) {
+                                view.navigateToMainScreen();
+                            }
+                        },
+                        throwable -> {
+                            Timber.e(throwable);
+                        }
+                );
 
-                    database.saveCoins(coinEntities);
-                }
+        disposables.add(disposable);
 
-                if (view != null) {
-                    view.navigateToMainScreen();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RateResponse> call, Throwable t) {
-                Timber.e(t);
-            }
-        });
     }
 
 }
