@@ -1,5 +1,7 @@
 package foxsay.ru.loftcoin.screens.rate;
 
+import foxsay.ru.loftcoin.utils.Fiat;
+
 public interface RatePresenter {
 
     void attachView(RateView view);
@@ -10,4 +12,7 @@ public interface RatePresenter {
 
     void onRefresh();
 
+    void onMenuItemCurrencyClick();
+
+    void onFiatCurrencySelected(Fiat currency);
 }
