@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -39,6 +40,8 @@ import timber.log.Timber;
  */
 public class RateFragment extends Fragment implements RateView, Toolbar.OnMenuItemClickListener, CurrencyDialog.CurrencyDialogListener {
 
+    private static final String LAYOUT_MANAGER_STATE = "layout_manager_state";
+
     public RateFragment() {
         // Required empty public constructor
     }
@@ -57,6 +60,8 @@ public class RateFragment extends Fragment implements RateView, Toolbar.OnMenuIt
 
     private RatePresenter presenter;
     private RateAdapter adapter;
+
+    public Parcelable layoutManagerState;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,14 +109,29 @@ public class RateFragment extends Fragment implements RateView, Toolbar.OnMenuIt
             }
         });
 
+        if (savedInstanceState != null) {
+            layoutManagerState = savedInstanceState.getParcelable(LAYOUT_MANAGER_STATE);
+        }
+
         presenter.attachView(this);
         presenter.getRate();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putParcelable(LAYOUT_MANAGER_STATE, recycler.getLayoutManager().onSaveInstanceState());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public void setCoins(List<CoinEntity> coins) {
         Timber.d("setCoins: " + coins);
         adapter.setItems(coins);
+
+        if (layoutManagerState != null) {
+            recycler.getLayoutManager().onRestoreInstanceState(layoutManagerState);
+            layoutManagerState = null;
+        }
     }
 
     @Override
