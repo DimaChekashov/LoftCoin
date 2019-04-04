@@ -4,18 +4,31 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding3.widget.RxTextView;
+import com.jakewharton.rxbinding3.widget.TextViewAfterTextChangeEvent;
+
+import java.util.concurrent.TimeUnit;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import foxsay.ru.loftcoin.App;
 import foxsay.ru.loftcoin.R;
+import foxsay.ru.loftcoin.data.db.Database;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 public class ConverterFragment extends Fragment {
 
@@ -31,7 +44,7 @@ public class ConverterFragment extends Fragment {
     ViewGroup sourceCurrency;
 
     @BindView(R.id.source_amount)
-    EditText sourceAmount;
+    AppCompatEditText sourceAmount;
 
     @BindView(R.id.destination_currency)
     ViewGroup destinationCurrency;
@@ -45,6 +58,8 @@ public class ConverterFragment extends Fragment {
     TextView destinationCurrencySymbolText;
     TextView destinationCurrencySymbolName;
 
+    private ConverterViewModel viewModel;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,6 +71,9 @@ public class ConverterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
+        Database database = ((App) getActivity().getApplication()).getDatabase();
+        viewModel = new ConverterViewModelImpl(savedInstanceState, database);
+
         toolbar.setTitle(R.string.converter_screen_title);
 
         sourceCurrencySymbolText = sourceCurrency.findViewById(R.id.symbol_text);
@@ -63,6 +81,23 @@ public class ConverterFragment extends Fragment {
 
         destinationCurrencySymbolText = destinationCurrency.findViewById(R.id.symbol_text);
         destinationCurrencySymbolName = destinationCurrency.findViewById(R.id.currency_name);
+
+        initOutputs();
+        initInputs();
+    }
+
+    private void initOutputs() {
+
+        Disposable disposable1 = RxTextView.afterTextChangeEvents(sourceAmount)
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(event -> {
+                    viewModel.onSourceAmountChange(event.getEditable().toString());
+                });
+
+    }
+
+    private void initInputs() {
 
     }
 }

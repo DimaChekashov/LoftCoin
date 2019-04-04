@@ -24,7 +24,7 @@
         android:paddingStart="20dp"
         android:paddingEnd="20dp">
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/source_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
