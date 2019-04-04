@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import foxsay.ru.loftcoin.R;
+import foxsay.ru.loftcoin.screens.converter.ConverterFragment;
 import foxsay.ru.loftcoin.screens.rate.RateFragment;
 
 import android.content.Context;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
 
                 case R.id.menu_item_converter:
-
+                    showConverterFragment();
                     return true;
             }
 
@@ -61,6 +62,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void showRateFragment() {
         RateFragment fragment = new RateFragment();
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.commit();
+    }
+
+    private void showConverterFragment() {
+        ConverterFragment fragment = new ConverterFragment();
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.fragment_container, fragment);

@@ -113,6 +113,13 @@ public class RateFragment extends Fragment implements RateView, Toolbar.OnMenuIt
             layoutManagerState = savedInstanceState.getParcelable(LAYOUT_MANAGER_STATE);
         }
 
+        Fragment fragment = getFragmentManager().findFragmentByTag(CurrencyDialog.TAG);
+
+        if (fragment != null) {
+            CurrencyDialog dialog = (CurrencyDialog) fragment;
+            dialog.setListener(this);
+        }
+
         presenter.attachView(this);
         presenter.getRate();
     }
