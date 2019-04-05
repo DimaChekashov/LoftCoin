@@ -116,7 +116,7 @@ public class ConverterFragment extends Fragment {
 
         Fragment bottomSheetDestination = getFragmentManager().findFragmentByTag(DESTINATION_CURRENCY_BOTTOM_SHEET_TAG);
         if (bottomSheetDestination != null) {
-            ((CurrenciesBottomSheet) bottomSheetDestination).setListener(destinationListner);
+            ((CurrenciesBottomSheet) bottomSheetDestination).setListener(destinationListener);
         }
 
         initOutputs();
@@ -181,7 +181,7 @@ public class ConverterFragment extends Fragment {
             bottomSheet.setListener(sourceListener);
         } else {
             bottomSheet.show(getFragmentManager(), DESTINATION_CURRENCY_BOTTOM_SHEET_TAG);
-            bottomSheet.setListener(destinationListner);
+            bottomSheet.setListener(destinationListener);
         }
     }
 
@@ -192,7 +192,7 @@ public class ConverterFragment extends Fragment {
         }
     };
 
-    private CurrenciesBottomSheetListener destinationListner = new CurrenciesBottomSheetListener() {
+    private CurrenciesBottomSheetListener destinationListener = new CurrenciesBottomSheetListener() {
         @Override
         public void onCurrencySelected(CoinEntity coin) {
             viewModel.onDestinationCurrencySelected(coin);
