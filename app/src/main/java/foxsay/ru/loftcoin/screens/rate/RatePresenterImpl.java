@@ -10,6 +10,7 @@ import foxsay.ru.loftcoin.data.db.Database;
 import foxsay.ru.loftcoin.data.db.model.CoinEntity;
 import foxsay.ru.loftcoin.data.db.model.CoinEntityMapper;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
+import foxsay.ru.loftcoin.utils.Fiat;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -98,5 +99,20 @@ public class RatePresenterImpl implements RatePresenter {
     @Override
     public void onRefresh() {
         loadRate();
+    }
+
+    @Override
+    public void onMenuItemCurrencyClick() {
+        if (view != null) {
+            view.showCurrencyDialog();
+        }
+    }
+
+    @Override
+    public void onFiatCurrencySelected(Fiat currency) {
+        prefs.setFiatCurrency(currency);
+        if (view != null) {
+            view.invalidateRates();
+        }
     }
 }

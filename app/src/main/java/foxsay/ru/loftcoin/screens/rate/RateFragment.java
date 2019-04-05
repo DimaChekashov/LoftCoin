@@ -9,8 +9,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,12 +32,15 @@ import foxsay.ru.loftcoin.data.db.model.CoinEntity;
 import foxsay.ru.loftcoin.data.db.model.CoinEntityMapper;
 import foxsay.ru.loftcoin.data.db.model.CoinEntityMapperImpl;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
+import foxsay.ru.loftcoin.utils.Fiat;
 import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RateFragment extends Fragment implements RateView {
+public class RateFragment extends Fragment implements RateView, Toolbar.OnMenuItemClickListener, CurrencyDialog.CurrencyDialogListener {
+
+    private static final String LAYOUT_MANAGER_STATE = "layout_manager_state";
 
     public RateFragment() {
         // Required empty public constructor
@@ -55,6 +60,8 @@ public class RateFragment extends Fragment implements RateView {
 
     private RatePresenter presenter;
     private RateAdapter adapter;
+
+    public Parcelable layoutManagerState;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,6 +95,8 @@ public class RateFragment extends Fragment implements RateView {
         ButterKnife.bind(this, view);
 
         toolbar.setTitle(R.string.rate_screen_title);
+        toolbar.inflateMenu(R.menu.menu_rate);
+        toolbar.setOnMenuItemClickListener(this);
 
         recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         recycler.setHasFixedSize(true);
@@ -100,14 +109,36 @@ public class RateFragment extends Fragment implements RateView {
             }
         });
 
+        if (savedInstanceState != null) {
+            layoutManagerState = savedInstanceState.getParcelable(LAYOUT_MANAGER_STATE);
+        }
+
+        Fragment fragment = getFragmentManager().findFragmentByTag(CurrencyDialog.TAG);
+
+        if (fragment != null) {
+            CurrencyDialog dialog = (CurrencyDialog) fragment;
+            dialog.setListener(this);
+        }
+
         presenter.attachView(this);
         presenter.getRate();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putParcelable(LAYOUT_MANAGER_STATE, recycler.getLayoutManager().onSaveInstanceState());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     public void setCoins(List<CoinEntity> coins) {
         Timber.d("setCoins: " + coins);
         adapter.setItems(coins);
+
+        if (layoutManagerState != null) {
+            recycler.getLayoutManager().onRestoreInstanceState(layoutManagerState);
+            layoutManagerState = null;
+        }
     }
 
     @Override
@@ -117,6 +148,29 @@ public class RateFragment extends Fragment implements RateView {
 
     @Override
     public void showCurrencyDialog() {
+        CurrencyDialog dialog = new CurrencyDialog();
+        dialog.show(getFragmentManager(), CurrencyDialog.TAG);
+        dialog.setListener(this);
+    }
 
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_currency:
+                presenter.onMenuItemCurrencyClick();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onCurrencySelected(Fiat currency) {
+        presenter.onFiatCurrencySelected(currency);
+    }
+
+    @Override
+    public void invalidateRates() {
+        adapter.notifyDataSetChanged();
     }
 }
