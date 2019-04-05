@@ -181,7 +181,7 @@ public class ConverterFragment extends Fragment {
             bottomSheet.setListener(sourceListener);
         } else {
             bottomSheet.show(getFragmentManager(), DESTINATION_CURRENCY_BOTTOM_SHEET_TAG);
-            bottomSheet.setListener(sourceListener);
+            bottomSheet.setListener(destinationListner);
         }
     }
 
