@@ -1,24 +1,23 @@
 package foxsay.ru.loftcoin.screens.converter;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding3.widget.RxTextView;
-import com.jakewharton.rxbinding3.widget.TextViewAfterTextChangeEvent;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -26,12 +25,17 @@ import butterknife.ButterKnife;
 import foxsay.ru.loftcoin.App;
 import foxsay.ru.loftcoin.R;
 import foxsay.ru.loftcoin.data.db.Database;
+import foxsay.ru.loftcoin.data.db.model.CoinEntity;
+import foxsay.ru.loftcoin.screens.currencies.CurrenciesBottomSheet;
+import foxsay.ru.loftcoin.screens.currencies.CurrenciesBottomSheetListener;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 public class ConverterFragment extends Fragment {
 
+    private static final String SOURCE_CURRENCY_BOTTOM_SHEET_TAG = "source_currency_bottom_sheet";
+    private static final String DESTINATION_CURRENCY_BOTTOM_SHEET_TAG = "destination_currency_bottom_sheet";
 
     public ConverterFragment() {
         // Required empty public constructor
@@ -60,6 +64,25 @@ public class ConverterFragment extends Fragment {
 
     private ConverterViewModel viewModel;
 
+    private CompositeDisposable disposables = new CompositeDisposable();
+
+    private Random random = new Random();
+
+    private static int[] colors = {
+            0xFFF5FF30,
+            0xFFFFFFFF,
+            0xFF2ABDF5,
+            0xFFFF7416,
+            0xFFFF7416,
+            0xFF534FFF
+    };
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        viewModel.saveState(outState);
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,22 +105,108 @@ public class ConverterFragment extends Fragment {
         destinationCurrencySymbolText = destinationCurrency.findViewById(R.id.symbol_text);
         destinationCurrencySymbolName = destinationCurrency.findViewById(R.id.currency_name);
 
+        if (savedInstanceState == null) {
+            sourceAmount.setText("1");
+        }
+
+        Fragment bottomSheetSource = getFragmentManager().findFragmentByTag(SOURCE_CURRENCY_BOTTOM_SHEET_TAG);
+        if (bottomSheetSource != null) {
+            ((CurrenciesBottomSheet) bottomSheetSource).setListener(sourceListener);
+        }
+
+        Fragment bottomSheetDestination = getFragmentManager().findFragmentByTag(DESTINATION_CURRENCY_BOTTOM_SHEET_TAG);
+        if (bottomSheetDestination != null) {
+            ((CurrenciesBottomSheet) bottomSheetDestination).setListener(destinationListner);
+        }
+
         initOutputs();
         initInputs();
+    }
+
+    @Override
+    public void onDestroyView() {
+        disposables.dispose();
+        super.onDestroyView();
     }
 
     private void initOutputs() {
 
         Disposable disposable1 = RxTextView.afterTextChangeEvents(sourceAmount)
-                .debounce(500, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(event -> {
                     viewModel.onSourceAmountChange(event.getEditable().toString());
                 });
 
+        sourceCurrency.setOnClickListener(v -> viewModel.onSourceCurrencyClick());
+
+        destinationCurrency.setOnClickListener(v -> viewModel.onDestinationCurrencyClick());
+
+        disposables.add(disposable1);
+
     }
 
     private void initInputs() {
+        Disposable disposable1 = viewModel.sourceCurrency().subscribe(s -> {
+            bindCurrency(s, sourceCurrencySymbolText, sourceCurrencySymbolName);
+        });
 
+        Disposable disposable2 = viewModel.destinationCurrency().subscribe(s -> {
+            bindCurrency(s, destinationCurrencySymbolText, destinationCurrencySymbolName);
+        });
+
+        Disposable disposable3 = viewModel.destinationAmount().subscribe(s -> {
+            destinationAmount.setText(s);
+        });
+
+        Disposable disposable4 = viewModel.selectSourceCurrency().subscribe(s -> {
+            showCurrenciesBottomSheet(true);
+        });
+
+        Disposable disposable5 = viewModel.selectDestinationCurrency().subscribe(s -> {
+            showCurrenciesBottomSheet(false);
+        });
+
+        disposables.add(disposable1);
+        disposables.add(disposable2);
+        disposables.add(disposable3);
+        disposables.add(disposable4);
+        disposables.add(disposable5);
+    }
+
+    private void showCurrenciesBottomSheet(boolean source) {
+        CurrenciesBottomSheet bottomSheet = new CurrenciesBottomSheet();
+
+        if (source) {
+            bottomSheet.show(getFragmentManager(), SOURCE_CURRENCY_BOTTOM_SHEET_TAG);
+            bottomSheet.setListener(sourceListener);
+        } else {
+            bottomSheet.show(getFragmentManager(), DESTINATION_CURRENCY_BOTTOM_SHEET_TAG);
+            bottomSheet.setListener(sourceListener);
+        }
+    }
+
+    private CurrenciesBottomSheetListener sourceListener = new CurrenciesBottomSheetListener() {
+        @Override
+        public void onCurrencySelected(CoinEntity coin) {
+            viewModel.onSourceCurrencySelected(coin);
+        }
+    };
+
+    private CurrenciesBottomSheetListener destinationListner = new CurrenciesBottomSheetListener() {
+        @Override
+        public void onCurrencySelected(CoinEntity coin) {
+            viewModel.onDestinationCurrencySelected(coin);
+        }
+    };
+
+    private void bindCurrency(String curr, TextView symbolText, TextView currencyName) {
+
+        Drawable background = symbolText.getBackground();
+        Drawable wrapped = DrawableCompat.wrap(background);
+        DrawableCompat.setTint(wrapped, colors[random.nextInt(colors.length)]);
+
+        symbolText.setText(String.valueOf(curr.charAt(0)));
+
+        currencyName.setText(curr);
     }
 }
