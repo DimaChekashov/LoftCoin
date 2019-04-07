@@ -66,6 +66,9 @@ dependencies {
     implementation "com.jakewharton.rxbinding3:rxbinding:$rx_binding_version"
     implementation "com.jakewharton.rxbinding3:rxbinding-appcompat:$rx_binding_version"
 
+    // Lifecycle
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+
     // Tests
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.2-alpha02'

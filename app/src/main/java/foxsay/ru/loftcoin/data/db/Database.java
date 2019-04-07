@@ -3,6 +3,8 @@ package foxsay.ru.loftcoin.data.db;
 import java.util.List;
 
 import foxsay.ru.loftcoin.data.db.model.CoinEntity;
+import foxsay.ru.loftcoin.data.db.model.Wallet;
+import foxsay.ru.loftcoin.data.db.model.WalletModel;
 import io.reactivex.Flowable;
 
 public interface Database {
@@ -12,5 +14,9 @@ public interface Database {
     Flowable<List<CoinEntity>> getCoins();
 
     CoinEntity getCoin(String symbol);
+
+    void saveWallet(Wallet wallet);
+
+    Flowable<List<WalletModel>> getWallets();
 
 }
