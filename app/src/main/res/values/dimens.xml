@@ -7,4 +7,8 @@
     <dimen name="dialog_item_height">56dp</dimen>
     <dimen name="dialog_icon_size">40dp</dimen>
 
+    <!-- wallet -->
+    <dimen name="item_wallet_width">240dp</dimen>
+    <dimen name="item_wallet_margin">20dp</dimen>
+
 </resources>
