@@ -4,6 +4,8 @@ import java.util.List;
 
 import foxsay.ru.loftcoin.data.db.Database;
 import foxsay.ru.loftcoin.data.db.model.CoinEntity;
+import foxsay.ru.loftcoin.data.db.model.Transaction;
+import foxsay.ru.loftcoin.data.db.model.TransactionModel;
 import foxsay.ru.loftcoin.data.db.model.Wallet;
 import foxsay.ru.loftcoin.data.db.model.WalletModel;
 import io.reactivex.Flowable;
@@ -39,5 +41,15 @@ public class DatabaseImplRoom implements Database {
     @Override
     public Flowable<List<WalletModel>> getWallets() {
         return appDatabase.walletDao().getWallets();
+    }
+
+    @Override
+    public void saveTransaction(List<Transaction> transactions) {
+        appDatabase.walletDao().saveTransactions(transactions);
+    }
+
+    @Override
+    public Flowable<List<TransactionModel>> getTransactions(String walletId) {
+        return appDatabase.walletDao().getTransaction(walletId);
     }
 }
