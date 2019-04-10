@@ -36,6 +36,10 @@ import foxsay.ru.loftcoin.screens.currencies.CurrenciesBottomSheetListener;
 
 public class WalletsFragment extends Fragment implements CurrenciesBottomSheetListener {
 
+    private static final String VIEW_PAGER_POS = "view_page_pos";
+
+    private int restoredViewPagerPos = 0;
+
     @BindView(R.id.wallets_toolbar)
     Toolbar toolbar;
 
@@ -101,10 +105,20 @@ public class WalletsFragment extends Fragment implements CurrenciesBottomSheetLi
             ((CurrenciesBottomSheet) bottomSheet).setListener(this);
         }
 
+        if (savedInstanceState != null) {
+            restoredViewPagerPos = savedInstanceState.getInt(VIEW_PAGER_POS, 0);
+        }
+
         viewModel.getWallets();
 
         initOutputs();
         initInputs();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putInt(VIEW_PAGER_POS, walletsPager.getCurrentItem());
+        super.onSaveInstanceState(outState);
     }
 
     private void initOutputs() {
@@ -147,6 +161,14 @@ public class WalletsFragment extends Fragment implements CurrenciesBottomSheetLi
 
         viewModel.transactions().observe(this, transactionModels -> {
             transactionsAdapter.setTransactions(transactionModels);
+        });
+
+        viewModel.wallets().observe(this, wallets -> {
+            walletsPagerAdapter.setWallets(wallets);
+            if (restoredViewPagerPos != 0) {
+                walletsPager.setCurrentItem(restoredViewPagerPos);
+                restoredViewPagerPos = 0;
+            }
         });
 
     }
