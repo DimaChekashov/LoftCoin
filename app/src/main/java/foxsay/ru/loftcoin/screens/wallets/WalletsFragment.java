@@ -21,6 +21,7 @@ import java.util.List;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
@@ -35,6 +36,10 @@ import foxsay.ru.loftcoin.screens.currencies.CurrenciesBottomSheetListener;
 
 public class WalletsFragment extends Fragment implements CurrenciesBottomSheetListener {
 
+    private static final String VIEW_PAGER_POS = "view_page_pos";
+
+    private int restoredViewPagerPos = 0;
+
     @BindView(R.id.wallets_toolbar)
     Toolbar toolbar;
 
@@ -48,6 +53,7 @@ public class WalletsFragment extends Fragment implements CurrenciesBottomSheetLi
     ViewGroup newWallet;
 
     private WalletsPagerAdapter walletsPagerAdapter;
+    private TransactionsAdapter transactionsAdapter;
     private WalletsViewModel viewModel;
 
     public WalletsFragment() {
@@ -63,6 +69,7 @@ public class WalletsFragment extends Fragment implements CurrenciesBottomSheetLi
         Prefs prefs = ((App) getActivity().getApplication()).getPrefs();
 
         walletsPagerAdapter = new WalletsPagerAdapter(prefs);
+        transactionsAdapter = new TransactionsAdapter(prefs);
     }
 
     @Override
@@ -80,6 +87,10 @@ public class WalletsFragment extends Fragment implements CurrenciesBottomSheetLi
         toolbar.setTitle(R.string.wallets_screen_title);
         toolbar.inflateMenu(R.menu.menu_wallets);
 
+        transactionsRecycler.setLayoutManager(new LinearLayoutManager(requireContext()));
+        transactionsRecycler.setHasFixedSize(true);
+        transactionsRecycler.setAdapter(transactionsAdapter);
+
         int screenWidth = getScreenWidth();
         int walletItemWidth = getResources().getDimensionPixelOffset(R.dimen.item_wallet_width);
         int walletItemMargin = getResources().getDimensionPixelOffset(R.dimen.item_wallet_margin);
@@ -94,10 +105,20 @@ public class WalletsFragment extends Fragment implements CurrenciesBottomSheetLi
             ((CurrenciesBottomSheet) bottomSheet).setListener(this);
         }
 
+        if (savedInstanceState != null) {
+            restoredViewPagerPos = savedInstanceState.getInt(VIEW_PAGER_POS, 0);
+        }
+
         viewModel.getWallets();
 
         initOutputs();
         initInputs();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putInt(VIEW_PAGER_POS, walletsPager.getCurrentItem());
+        super.onSaveInstanceState(outState);
     }
 
     private void initOutputs() {
@@ -109,6 +130,13 @@ public class WalletsFragment extends Fragment implements CurrenciesBottomSheetLi
         toolbar.getMenu().findItem(R.id.menu_item_add_wallet).setOnMenuItemClickListener((MenuItem.OnMenuItemClickListener) item -> {
             viewModel.onNewWalletClick();
             return true;
+        });
+
+        walletsPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                viewModel.onWalletChanged(position);
+            }
         });
 
     }
@@ -129,7 +157,16 @@ public class WalletsFragment extends Fragment implements CurrenciesBottomSheetLi
 
         viewModel.wallets().observe(this, wallets -> {
             walletsPagerAdapter.setWallets(wallets);
+            if (restoredViewPagerPos != 0) {
+                walletsPager.setCurrentItem(restoredViewPagerPos);
+                restoredViewPagerPos = 0;
+            }
         });
+
+        viewModel.transactions().observe(this, transactionModels -> {
+            transactionsAdapter.setTransactions(transactionModels);
+        });
+
     }
 
     private void showCurrenciesBottomSheet() {
