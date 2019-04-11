@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -126,6 +125,7 @@ public class ConverterFragment extends Fragment {
     @Override
     public void onDestroyView() {
         disposables.dispose();
+        viewModel.onDetach();
         super.onDestroyView();
     }
 

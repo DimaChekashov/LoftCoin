@@ -6,6 +6,7 @@ import foxsay.ru.loftcoin.data.api.Api;
 import foxsay.ru.loftcoin.data.api.ApiInitializer;
 import foxsay.ru.loftcoin.data.db.Database;
 import foxsay.ru.loftcoin.data.db.DatabaseInitializer;
+import foxsay.ru.loftcoin.data.db.realm.DatabaseImplRealm;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
 import foxsay.ru.loftcoin.data.prefs.PrefsImpl;
 import timber.log.Timber;
@@ -14,7 +15,6 @@ public class App extends Application {
 
     private Prefs prefs;
     private Api api;
-    private Database database;
 
     @Override
     public void onCreate() {
@@ -24,7 +24,7 @@ public class App extends Application {
 
         prefs = new PrefsImpl(this);
         api = new ApiInitializer().init();
-        database = new DatabaseInitializer().init(this);
+        new DatabaseInitializer().init(this);
     }
 
     public Prefs getPrefs() {
@@ -36,6 +36,6 @@ public class App extends Application {
     }
 
     public Database getDatabase() {
-        return database;
+        return new DatabaseImplRealm();
     }
 }

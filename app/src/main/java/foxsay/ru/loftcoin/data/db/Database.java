@@ -4,12 +4,14 @@ import java.util.List;
 
 import foxsay.ru.loftcoin.data.db.model.CoinEntity;
 import foxsay.ru.loftcoin.data.db.model.Transaction;
-import foxsay.ru.loftcoin.data.db.model.TransactionModel;
 import foxsay.ru.loftcoin.data.db.model.Wallet;
-import foxsay.ru.loftcoin.data.db.model.WalletModel;
 import io.reactivex.Flowable;
 
 public interface Database {
+
+    void open();
+
+    void close();
 
     void saveCoins(List<CoinEntity> coins);
 
@@ -19,10 +21,10 @@ public interface Database {
 
     void saveWallet(Wallet wallet);
 
-    Flowable<List<WalletModel>> getWallets();
+    Flowable<List<Wallet>> getWallets();
 
     void saveTransaction(List<Transaction> transactions);
 
-    Flowable<List<TransactionModel>> getTransactions(String walletId);
+    Flowable<List<Transaction>> getTransactions(String walletId);
 
 }
