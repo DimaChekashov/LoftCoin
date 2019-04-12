@@ -11,6 +11,7 @@ import foxsay.ru.loftcoin.data.db.model.CoinEntity;
 import foxsay.ru.loftcoin.data.db.model.CoinEntityMapper;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
 import foxsay.ru.loftcoin.utils.Fiat;
+import foxsay.ru.loftcoin.work.WorkHelper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -28,6 +29,7 @@ public class RatePresenterImpl implements RatePresenter {
     private Database mainDatabase;
     private Database workerDatabase;
     private CoinEntityMapper coinEntityMapper;
+    private WorkHelper workHelper;
 
     @Nullable
     private RateView view;
@@ -38,12 +40,14 @@ public class RatePresenterImpl implements RatePresenter {
                              Api api,
                              Database mainDatabase,
                              Database workerDatabase,
-                             CoinEntityMapper coinEntityMapper) {
+                             CoinEntityMapper coinEntityMapper,
+                             WorkHelper workHelper) {
         this.prefs = prefs;
         this.api = api;
         this.mainDatabase = mainDatabase;
         this.workerDatabase = workerDatabase;
         this.coinEntityMapper = coinEntityMapper;
+        this.workHelper = workHelper;
     }
 
     @Override
@@ -124,5 +128,11 @@ public class RatePresenterImpl implements RatePresenter {
         if (view != null) {
             view.invalidateRates();
         }
+    }
+
+    @Override
+    public void onRateLongClick(String symbol) {
+        Timber.d("onRateLongClick: symbol = %s", symbol);
+        workHelper.startSyncRateWorker(symbol);
     }
 }
