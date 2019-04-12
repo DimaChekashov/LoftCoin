@@ -17,9 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import java.util.List;
-
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +26,6 @@ import butterknife.ButterKnife;
 import foxsay.ru.loftcoin.App;
 import foxsay.ru.loftcoin.R;
 import foxsay.ru.loftcoin.data.db.model.CoinEntity;
-import foxsay.ru.loftcoin.data.db.model.WalletModel;
 import foxsay.ru.loftcoin.data.prefs.Prefs;
 import foxsay.ru.loftcoin.screens.currencies.CurrenciesBottomSheet;
 import foxsay.ru.loftcoin.screens.currencies.CurrenciesBottomSheetListener;
@@ -163,8 +159,8 @@ public class WalletsFragment extends Fragment implements CurrenciesBottomSheetLi
             }
         });
 
-        viewModel.transactions().observe(this, transactionModels -> {
-            transactionsAdapter.setTransactions(transactionModels);
+        viewModel.transactions().observe(this, Transactions -> {
+            transactionsAdapter.setTransactions(Transactions);
         });
 
     }

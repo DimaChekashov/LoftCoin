@@ -17,7 +17,6 @@ import foxsay.ru.loftcoin.App;
 import foxsay.ru.loftcoin.R;
 import foxsay.ru.loftcoin.data.db.Database;
 import foxsay.ru.loftcoin.data.db.model.CoinEntity;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
@@ -40,6 +39,8 @@ public class CurrenciesBottomSheet extends BottomSheetDialogFragment implements 
         database = ((App) getActivity().getApplication()).getDatabase();
         adapter = new CurrenciesAdapter();
         adapter.setListener(this);
+
+        database.open();
     }
 
     @Nullable
@@ -58,7 +59,6 @@ public class CurrenciesBottomSheet extends BottomSheetDialogFragment implements 
         recycler.setAdapter(adapter);
 
         Disposable disposable = database.getCoins()
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(coins -> adapter.setCoins(coins));
 
         disposables.add(disposable);
@@ -67,6 +67,7 @@ public class CurrenciesBottomSheet extends BottomSheetDialogFragment implements 
     @Override
     public void onDestroy() {
         disposables.clear();
+        database.close();
         super.onDestroy();
     }
 

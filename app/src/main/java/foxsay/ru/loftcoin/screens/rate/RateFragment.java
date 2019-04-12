@@ -10,7 +10,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +25,6 @@ import butterknife.ButterKnife;
 import foxsay.ru.loftcoin.App;
 import foxsay.ru.loftcoin.R;
 import foxsay.ru.loftcoin.data.api.Api;
-import foxsay.ru.loftcoin.data.api.model.Coin;
 import foxsay.ru.loftcoin.data.db.Database;
 import foxsay.ru.loftcoin.data.db.model.CoinEntity;
 import foxsay.ru.loftcoin.data.db.model.CoinEntityMapper;
@@ -75,10 +73,11 @@ public class RateFragment extends Fragment implements RateView, Toolbar.OnMenuIt
 
         Api api = ((App) getActivity().getApplication()).getApi();
         Prefs prefs = ((App) getActivity().getApplication()).getPrefs();
-        Database database = ((App) getActivity().getApplication()).getDatabase();
+        Database mainDatabase = ((App) getActivity().getApplication()).getDatabase();
+        Database workerDatabase = ((App) getActivity().getApplication()).getDatabase();
         CoinEntityMapper mapper = new CoinEntityMapperImpl();
 
-        presenter = new RatePresenterImpl(prefs, api, database, mapper);
+        presenter = new RatePresenterImpl(prefs, api, mainDatabase, workerDatabase, mapper);
         adapter = new RateAdapter(prefs);
     }
 

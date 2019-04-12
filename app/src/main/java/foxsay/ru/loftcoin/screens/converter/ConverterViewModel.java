@@ -29,4 +29,5 @@ public interface ConverterViewModel {
 
     void saveState(Bundle state);
 
+    void onDetach();
 }
