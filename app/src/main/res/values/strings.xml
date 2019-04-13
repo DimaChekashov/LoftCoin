@@ -37,4 +37,7 @@
     <string name="symbol_eur" translatable="false">€</string>
     <string name="symbol_rub" translatable="false">₽</string>
 
+    <string name="notification_channel_rate_changed">Изменение курса</string>
+    <string name="notification_rate_changed_body">Курс изменился %s</string>
+
 </resources>
